@@ -1,0 +1,26 @@
+#!/usr/bin/env python
+# encoding: utf-8
+import argparse
+import sys
+import json
+from echoprint_server import \
+    load_inverted_index, query_inverted_index, \
+    parsed_code_streamer, parsing_code_streamer
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-p', '--already-parsed', action='store_true',
+                        help='input has been already parsed as a \
+                        comma-separated list of integer codes (no offset \
+                        information)')
+    parser.add_argument('indexfiles', nargs='+', \
+                        help='inverted index files (in order)')
+    args = parser.parse_args()
+    inverted_index = load_inverted_index(args.indexfiles)
+    streamer = parsed_code_streamer if args.already_parsed \
+               else parsing_code_streamer
+    for codes in streamer(sys.stdin):
+        print json.dumps(
+            {'results' : query_inverted_index(
+                codes, inverted_index, 'jaccard')})

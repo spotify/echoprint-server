@@ -1,0 +1,64 @@
+#!/usr/bin/env python
+# encoding: utf-8
+import argparse
+import sys
+from operator import itemgetter
+from flask import Flask, jsonify, request
+from echoprint_server import \
+    decode_echoprint, query_inverted_index, load_inverted_index
+
+use_tornado = False
+try:
+    from tornado.wsgi import WSGIContainer
+    from tornado.httpserver import HTTPServer
+    from tornado.ioloop import IOLoop
+    use_tornado = True
+except:
+    print 'cannot import tornado'
+
+app = Flask(__name__)
+
+
+@app.route('/query/<method>', methods=['POST'])
+def rest_query(method):
+    NRES = 20
+    echoprint_string = request.form['echoprint']
+    _, codes = decode_echoprint(str(echoprint_string))
+    results = query_inverted_index(codes, app.inverted_index, str(method))
+    # optionally augment results with gids
+    if app.gids is not None:
+        for r in results:
+            r['id'] = app.gids[r['index']]
+    return jsonify(results=results)
+
+
+if __name__ == '__main__':
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-f', '--flask', action='store_true')
+    parser.add_argument('-i', '--ids-file',
+                        help='ids_file contains track ids, one per line')
+    parser.add_argument('-p', '--port', type=int, default=5678,
+                        help='service port (default: 5678)')
+    parser.add_argument('inverted_index_paths', nargs='+')
+    args = parser.parse_args()
+
+    app.inverted_index = load_inverted_index(args.inverted_index_paths)
+    if app.inverted_index is None:
+        print >> sys.stderr, 'loading inverted index from %s failed' % \
+            args.inverted_index_dir
+        exit(1)
+    print 'loaded inverted index'
+
+    if args.ids_file is not None:
+        app.gids = [l.strip() for l in open(args.ids_file)]
+    else:
+        app.gids = None
+
+    if args.flask or (not use_tornado):
+        print 'starting app with flask'
+        app.run(debug=True, host='0.0.0.0', port=args.port)
+    else:
+        http_server = HTTPServer(WSGIContainer(app))
+        http_server.listen(args.port)
+        IOLoop.instance().start()

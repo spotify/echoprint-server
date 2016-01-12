@@ -1,0 +1,13 @@
+#!/usr/bin/env python
+# encoding: utf-8
+import argparse
+from echoprint_server import load_inverted_index, inverted_index_size
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('indexfiles', nargs='+', \
+                        help='inverted index files (in order)')
+    args = parser.parse_args()
+    inverted_index = load_inverted_index(args.indexfiles)
+    print inverted_index_size(inverted_index)

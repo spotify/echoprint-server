@@ -1,0 +1,19 @@
+#!/usr/bin/env python
+# encoding: utf-8
+import sys
+import argparse
+from echoprint_server import load_inverted_index, create_inverted_index, \
+    parsed_code_streamer, parsing_code_streamer
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-p', '--already-parsed', action='store_true',
+                        help='input has been already parsed as a \
+                        comma-separated list of integer codes (no offset \
+                        information)')
+    parser.add_argument('indexfile', help='output path')
+    args = parser.parse_args()
+    streamer = parsed_code_streamer if args.already_parsed \
+               else parsing_code_streamer
+    create_inverted_index(streamer(sys.stdin), args.indexfile)
