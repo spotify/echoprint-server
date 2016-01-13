@@ -1,4 +1,4 @@
-'''
+/*
  * Copyright (c) 2016 Spotify AB.
  *
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -17,10 +17,30 @@
  * KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations
  * under the License.
-'''
-from .lib import \
-    decode_echoprint, create_inverted_index, \
-    parsed_code_streamer, parsing_code_streamer
-from echoprint_server_c import \
-    load_inverted_index, inverted_index_size, \
-    query_inverted_index
+ */
+package com.spotify.echoprintserver.nativelib;
+
+/**
+ * Single result among those returned from a query.
+ */
+public class QueryResult {
+
+  int index;
+  float score;
+
+  public QueryResult(int index, float score) {
+    this.index = index;
+    this.score = score;
+  }
+
+  /**
+   * Index of the song in the inverted index (0-based).
+   */
+  public int getIndex() { return index; }
+
+  /**
+   * Similarity score.
+   */
+  public float getScore() { return score; }
+
+}

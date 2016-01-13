@@ -1,3 +1,23 @@
+'''
+ * Copyright (c) 2016 Spotify AB.
+ *
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+'''
 import base64
 import zlib
 import shutil
@@ -22,7 +42,7 @@ def decode_echoprint(echoprint_b64_zipped):
     unzipped = zlib.decompress(zipped)
     N = len(unzipped)
     offsets = [int(''.join(o), 16) for o in split_seq(unzipped[:N/2], 5)]
-    codes =  [int(''.join(o), 16) for o in split_seq(unzipped[N/2:], 5)]
+    codes = [int(''.join(o), 16) for o in split_seq(unzipped[N/2:], 5)]
     return offsets, codes
 
 
@@ -48,6 +68,7 @@ def parsed_code_streamer(fstream):
     '''
     for line in fstream:
         yield [int(c) for c in line.strip().split(',')]
+
 
 def parsing_code_streamer(fstream):
     '''

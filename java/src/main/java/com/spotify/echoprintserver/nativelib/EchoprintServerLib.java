@@ -1,4 +1,4 @@
-'''
+/*
  * Copyright (c) 2016 Spotify AB.
  *
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -17,10 +17,33 @@
  * KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations
  * under the License.
-'''
-from .lib import \
-    decode_echoprint, create_inverted_index, \
-    parsed_code_streamer, parsing_code_streamer
-from echoprint_server_c import \
-    load_inverted_index, inverted_index_size, \
-    query_inverted_index
+ */
+package com.spotify.echoprintserver.nativelib;
+
+import com.sun.jna.Library;
+import com.sun.jna.Native;
+import com.sun.jna.Pointer;
+
+
+/**
+ * JNA bridge to C library.
+ */
+public interface EchoprintServerLib extends Library {
+
+  EchoprintServerLib INSTANCE = (EchoprintServerLib)
+    Native.loadLibrary("echoprintserver", EchoprintServerLib.class);
+
+  Pointer echoprint_inverted_index_load_from_paths(
+    String[] paths, int n_files);
+
+  void echoprint_inverted_index_free(
+    Pointer index);
+
+  int echoprint_inverted_index_query(
+    int query_length, int[] query, Pointer index,
+    int n_results, int[] output_indices, float[] output_scores,
+    int comparisonFunction);
+
+  int echoprint_inverted_index_get_n_songs(Pointer index);
+
+}

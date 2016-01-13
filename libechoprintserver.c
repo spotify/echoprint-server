@@ -1,3 +1,23 @@
+/*
+ * Copyright (c) 2016 Spotify AB.
+ *
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
@@ -23,9 +43,9 @@ void _sequence_to_set_inplace(uint32_t *seq, uint32_t *length)
     while(j < *length)
     {
       if(seq[i] == seq[j])
-	j++;
+        j++;
       else
-	seq[++i] = seq[j++];
+        seq[++i] = seq[j++];
     }
     *length = i + 1;
   }
@@ -56,8 +76,8 @@ void echoprint_inverted_index_block_similarity(
     {
       for(n = 0; n < codeblock_length; n++)
       {
-	uint16_t song_index = index_block->song_indices[offset + n];
-	output[song_index]++;
+        uint16_t song_index = index_block->song_indices[offset + n];
+        output[song_index]++;
       }
       i++;
       j++;
@@ -66,11 +86,11 @@ void echoprint_inverted_index_block_similarity(
     else
     {
       if(qc < ic)
-	j++;
+        j++;
       else
       {
-	i++;
-	offset += codeblock_length;
+        i++;
+        offset += codeblock_length;
       }
     }
   }
@@ -148,7 +168,6 @@ uint32_t echoprint_inverted_index_query(
     output_scores[n] = -1.;
   }
 
-  // TODO sort and uniq() query (and update query_length)
   _sequence_to_set_inplace(query, &query_length);
 
   song_index_base = 0;
@@ -160,13 +179,13 @@ uint32_t echoprint_inverted_index_query(
     {
       float ith_score = tmp_scores[i];
       int ith_pos = first_index_smaller_than(
-	output_scores, n_results, ith_score);
+        output_scores, n_results, ith_score);
       if(ith_pos < n_results)
       {
-	shift_outputs_right(
-	  ith_pos, n_results, output_indices, output_scores);
-	output_indices[ith_pos] = song_index_base + i;
-	output_scores[ith_pos] = ith_score;
+        shift_outputs_right(
+          ith_pos, n_results, output_indices, output_scores);
+        output_indices[ith_pos] = song_index_base + i;
+        output_scores[ith_pos] = ith_score;
       }
     }
     song_index_base += index->blocks[b].n_songs;
@@ -186,8 +205,6 @@ void _load_echoprint_inverted_index_block(
 {
   int n;
   int n_tot_song_indices;
-  /* fseek(fp, 0L, SEEK_END); */
-  /* int fp_size = ftell(fp); */
   fseek(fp, 0L, SEEK_SET);
 
   fread(&(block->n_codes), sizeof(uint32_t), 1, fp);
@@ -208,7 +225,7 @@ void _load_echoprint_inverted_index_block(
   fread(block->song_indices, sizeof(uint16_t), n_tot_song_indices, fp);
 }
 
-// n.b. does not free block itself
+// does not free block itself
 void echoprint_inverted_index_free_block(
   EchoprintInvertedIndexBlock *block)
 {
@@ -274,30 +291,20 @@ void echoprint_inverted_index_block_serialize(
   fwrite(&(block->n_codes), sizeof(uint32_t), 1, fp);
   fwrite(&(block->n_songs), sizeof(uint32_t), 1, fp);
   fwrite(block->codes, sizeof(uint32_t), block->n_codes, fp);
-  /* printf("code_lengths starts at %ld\n", */
-  /* 	 sizeof(uint32_t) * (2 + block->n_codes)); */
   fwrite(block->code_lengths, sizeof(uint32_t), block->n_codes, fp);
-  /* printf("song_lengths starts at %ld\n", */
-  /* 	 sizeof(uint32_t) * (2 + block->n_codes + block->n_codes)); */
   fwrite(block->song_lengths, sizeof(uint32_t), block->n_songs, fp);
-  /* printf("song_lengths starts at %ld\n", */
-  /* 	 sizeof(uint32_t) * (2 + block->n_codes + block->n_codes + block->n_songs)); */
   fwrite(block->song_indices, sizeof(uint16_t), song_indices_length, fp);
 }
 
 
-
-
-
-
-// N.B. `output` is malloc-ed
-// `sequences` and `sequence_lengths` are modified in-place
+// `output` is malloc-ed; `sequences` and `sequence_lengths` are
+// modified in-place
 void _inplace_sort_and_merge(uint32_t **sequences,
-			     uint32_t *sequence_lengths,
-			     uint32_t n_sequences,
-			     uint32_t **output,
-			     uint32_t *output_length,
-			     int code_sequences_already_sorted_distinct)
+                             uint32_t *sequence_lengths,
+                             uint32_t n_sequences,
+                             uint32_t **output,
+                             uint32_t *output_length,
+                             int code_sequences_already_sorted_distinct)
 {
   uint32_t n, i, out_len;
   uint32_t *out;
@@ -317,8 +324,6 @@ void _inplace_sort_and_merge(uint32_t **sequences,
     i += len_n;
   }
   _sequence_to_set_inplace(out, &out_len);
-  /* out_len = _merge_multiple_sorted_sequences_pivot( */
-  /*   sequences, sequence_lengths, n_sequences, out); */
   *output_length = out_len;
   *output = out;
 }
@@ -335,7 +340,7 @@ void echoprint_inverted_index_block_from_song_codes(
   uint16_t *song_indices;
 
   _inplace_sort_and_merge(songs_codes, song_lengths, n_songs,
-			  &codes, &n_codes, code_sequences_already_sorted_distinct);
+                          &codes, &n_codes, code_sequences_already_sorted_distinct);
 
   code_lengths = (uint32_t *) malloc(sizeof(uint32_t) * n_codes);
   for(i = 0; i < n_codes; i++)
@@ -346,7 +351,7 @@ void echoprint_inverted_index_block_from_song_codes(
     for(c = 0; c < song_lengths[i]; c++)
     {
       while(codes[offset] != songs_codes[i][c])
-	offset++;
+        offset++;
       code_lengths[offset]++;
     }
   }
@@ -368,7 +373,7 @@ void echoprint_inverted_index_block_from_song_codes(
     {
       uint32_t code = songs_codes[i][c];
       while(codes[offset] != code)
-	offset++;
+        offset++;
       song_indices[code_offsets[offset]] = i;
       code_offsets[offset]++;
     }
@@ -395,7 +400,7 @@ uint32_t echoprint_inverted_index_get_n_songs(
   return n_total;
 }
 
-void echoprint_inverted_index_build_write_block(
+int echoprint_inverted_index_build_write_block(
   uint32_t **block_songs_codes,
   uint32_t *block_song_lengths,
   uint32_t n_songs,
@@ -404,16 +409,14 @@ void echoprint_inverted_index_build_write_block(
 {
   FILE *fout;
   EchoprintInvertedIndexBlock block;
+  fout = fopen(path_out, "w");
+  if(fout == 0)
+    return 1;
   echoprint_inverted_index_block_from_song_codes(
     block_songs_codes, block_song_lengths, n_songs, &block,
     code_sequences_already_sorted_distinct);
-  fout = fopen(path_out, "w");
-  if(fout == 0)
-  {
-    fprintf(stderr, "cannot open %s for output\n", path_out);
-    exit(1);
-  }
   echoprint_inverted_index_block_serialize(&block, fout);
   fclose(fout);
   echoprint_inverted_index_free_block(&block);
+  return 0;
 }

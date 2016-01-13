@@ -1,4 +1,4 @@
-'''
+/*
  * Copyright (c) 2016 Spotify AB.
  *
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -17,10 +17,17 @@
  * KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations
  * under the License.
-'''
-from .lib import \
-    decode_echoprint, create_inverted_index, \
-    parsed_code_streamer, parsing_code_streamer
-from echoprint_server_c import \
-    load_inverted_index, inverted_index_size, \
-    query_inverted_index
+ */
+package com.spotify.echoprintserver.nativelib;
+
+/**
+ * Comparison functions (normalization schemes) to be used when querying the inverted index.
+ * N.B. the values of the constants must match those at the top of libechoprintserver.h
+ */
+public class ComparisonFunctions {
+
+  public static final int JACCARD = 0;
+  public static final int SET_INT = 1;
+  public static final int SET_INT_NORM_LENGTH_FIRST = 2;
+
+}

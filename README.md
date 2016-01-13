@@ -1,25 +1,43 @@
 # echoprint-server #
 
-A C library, with Python bindings, for fast indexing and querying of
-echoprint data.
+A C library, with a Python extension module and Java bindings, for
+fast indexing and querying of [echoprint](http://echoprint.me/) data.
 
+
+## Installation ##
+
+The standalone C library is built with CMake. This step is required
+for using the Java (but not for the Python) bindings.
+
+To build the Python extension module , run `python setup.py install`.
 
 ## Usage ##
 
-To build, run `python setup.py install`.
-The following documents convenience scripts in the `bin/` directory.
+The rest of this file documents the usage of `echoprint-server` via
+the Python extension module, through a set of convenience scripts in
+the `bin/` directory.
+
+For the Java bindings, please refer to the `UsageExample.java` file.
+
+The echoprint code generator, used to convert audio files into
+echoprint strings, can be found here:
+[echoprint-codegen](https://github.com/echonest/echoprint-codegen).
 
 #### WARNING ####
 
 The library uses a custom binary format for speed. At this point,
 **ENDIANNESS IS NOT CHECKED** so moving index files between machines
-with different architectures might cause problems.
+with different architectures might cause problems. The code has been
+tested on *little endian* machines.
+
+The Java code for creating indices explicitly assumes a *little
+endian* architecture.
 
 
 ### `echoprint-decode` ###
 
-Convert a codestring as output by `echoprint-codegen` into
-the corresponding list of codes represented as comma-separated integers.
+Convert a codestring as output by `echoprint-codegen` into the
+corresponding list of codes represented as comma-separated integers.
 
 Usage:
 
@@ -30,8 +48,9 @@ Usage:
 
 `150555,1035718,621673,794882,40662,955768,96899,166055,...`
 
-*N.B. This script only outputs only the echoprint codes, not the
- offsets.*
+*This script only outputs only the echoprint codes, not the
+ offsets. `jq` is a command line tool to process JSON strings, it can
+ be found [here](https://stedolan.github.io/jq/).*
 
 
 ### `echoprint-inverted-index` ###
@@ -164,13 +183,6 @@ Results should be similar to
     }
 
 
-## Building the standalone C library ##
-
-Build with CMake.
-
-Depending on the platform, `libechoprinttools.so` (linux) or
-`libechoprinttools.dylib` will be created. On linux it might be
-necessary to put the library file in `LD_LIBRARY_PATH`.
 
 
 ## Implementation details ##
@@ -183,5 +195,12 @@ are not considered, nor are the codes' multiplicities.
 
 ### Inverted index binary format ###
 
-The inverted index is serialized as a memory dump of all the fields of
-the `EchoprintInvertedIndex` struct defined in the header file.
+The inverted index is serialized as several *blocks*, each being a
+memory dump of the `EchoprintInvertedIndexBlock` struct defined in the
+header file.
+
+## License :memo:
+The project is available under the [Apache 2.0](http://www.apache.org/licenses/LICENSE-2.0) license.
+
+## Contributing :mailbox_with_mail:
+Contributions are welcomed, have a look at the [CONTRIBUTING.md](CONTRIBUTING.md) document for more information.

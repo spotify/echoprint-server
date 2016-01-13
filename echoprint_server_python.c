@@ -1,3 +1,23 @@
+/*
+ * Copyright (c) 2016 Spotify AB.
+ *
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 #include <stdio.h>
 #include <Python.h>
 #include "libechoprintserver.h"
@@ -15,24 +35,33 @@ static char inverted_index_create_block_docstring[] =
   "create an index block";
 
 /* Available functions */
-static PyObject *echoprint_py_load_inverted_index(PyObject *self, PyObject *args);
-static PyObject *echoprint_py_query_inverted_index(PyObject *self, PyObject *args);
-static PyObject *echoprint_py_inverted_index_size(PyObject *self, PyObject *args);
-static PyObject *echoprint_py_inverted_index_create_block(PyObject *self, PyObject *args);
+static PyObject *echoprint_py_load_inverted_index(
+  PyObject *self, PyObject *args);
+static PyObject *echoprint_py_query_inverted_index(
+  PyObject *self, PyObject *args);
+static PyObject *echoprint_py_inverted_index_size(
+  PyObject *self, PyObject *args);
+static PyObject *echoprint_py_inverted_index_create_block(
+  PyObject *self, PyObject *args);
 
 /* Module specification */
 static PyMethodDef module_methods[] = {
-  {"load_inverted_index", echoprint_py_load_inverted_index, METH_VARARGS, load_inverted_index_docstring},
-  {"inverted_index_size", echoprint_py_inverted_index_size, METH_VARARGS, inverted_index_size_docstring},
-  {"query_inverted_index", echoprint_py_query_inverted_index, METH_VARARGS, query_inverted_index_docstring},
-  {"_create_index_block", echoprint_py_inverted_index_create_block, METH_VARARGS, inverted_index_create_block_docstring},
+  {"load_inverted_index", echoprint_py_load_inverted_index,
+   METH_VARARGS, load_inverted_index_docstring},
+  {"inverted_index_size", echoprint_py_inverted_index_size,
+   METH_VARARGS, inverted_index_size_docstring},
+  {"query_inverted_index", echoprint_py_query_inverted_index,
+   METH_VARARGS, query_inverted_index_docstring},
+  {"_create_index_block", echoprint_py_inverted_index_create_block,
+   METH_VARARGS, inverted_index_create_block_docstring},
   {NULL, NULL, 0, NULL}
 };
 
 /* Initialize the module */
 PyMODINIT_FUNC initechoprint_server_c(void)
 {
-  PyObject *m = Py_InitModule3("echoprint_server_c", module_methods, module_docstring);
+  PyObject *m = Py_InitModule3(
+    "echoprint_server_c", module_methods, module_docstring);
   if (m == NULL)
     return;
 }
@@ -46,7 +75,8 @@ static void echoprint_py_free_inverted_index(PyObject *object)
 }
 
 // constructor
-static PyObject *echoprint_py_load_inverted_index(PyObject *self, PyObject *args)
+static PyObject *echoprint_py_load_inverted_index(
+  PyObject *self, PyObject *args)
 {
   PyObject *arg_index_file_list;
   EchoprintInvertedIndex *index;
@@ -69,7 +99,8 @@ static PyObject *echoprint_py_load_inverted_index(PyObject *self, PyObject *args
       PyErr_SetString(PyExc_TypeError, "argument's items must be strings");
       return NULL;
     }
-    index_file_paths[n] = PyString_AsString(PyList_GetItem(arg_index_file_list, n));
+    index_file_paths[n] = PyString_AsString(
+      PyList_GetItem(arg_index_file_list, n));
   }
   index = echoprint_inverted_index_load_from_paths(index_file_paths, n_blocks);
   free(index_file_paths);
@@ -82,7 +113,8 @@ static PyObject *echoprint_py_load_inverted_index(PyObject *self, PyObject *args
 }
 
 // size of the inverted index
-static PyObject *echoprint_py_inverted_index_size(PyObject *self, PyObject *args)
+static PyObject *echoprint_py_inverted_index_size(
+  PyObject *self, PyObject *args)
 {
   PyObject *arg_index;
   EchoprintInvertedIndex *index;
@@ -98,7 +130,8 @@ static PyObject *echoprint_py_inverted_index_size(PyObject *self, PyObject *args
 }
 
 // query
-static PyObject *echoprint_py_query_inverted_index(PyObject *self, PyObject *args)
+static PyObject *echoprint_py_query_inverted_index(
+  PyObject *self, PyObject *args)
 {
   PyObject *arg_query, *arg_index, *arg_sim_fun;
   EchoprintInvertedIndex *index;
@@ -118,11 +151,12 @@ static PyObject *echoprint_py_query_inverted_index(PyObject *self, PyObject *arg
     sf = JACCARD;
   else if(strcmp(PyString_AsString(arg_sim_fun), "set_int") == 0)
     sf = SET_INT;
-  else if(strcmp(PyString_AsString(arg_sim_fun), "set_int_norm_length_first") == 0)
+  else if(strcmp(PyString_AsString(arg_sim_fun),
+		 "set_int_norm_length_first") == 0)
     sf = SET_INT_NORM_LENGTH_FIRST;
   else
   {
-    PyErr_SetString(PyExc_Exception, "the similarity function argument must be one of: \"jaccard\", \"set_int\", \"set_int_norm_length_first\"");
+    PyErr_SetString(PyExc_Exception, "similarity must be one of: \"jaccard\", \"set_int\", \"set_int_norm_length_first\"");
     return NULL;
   }
 
@@ -142,7 +176,8 @@ static PyObject *echoprint_py_query_inverted_index(PyObject *self, PyObject *arg
     code_obj = PySequence_GetItem(arg_query, n);
     if(!PyInt_Check(code_obj))
     {
-      PyErr_SetString(PyExc_TypeError, "all the codes in the query must be integers");
+      PyErr_SetString(
+	PyExc_TypeError, "all the codes in the query must be integers");
       Py_DECREF(code_obj);
       free(query);
       return NULL;
@@ -164,9 +199,9 @@ static PyObject *echoprint_py_query_inverted_index(PyObject *self, PyObject *arg
   {
     PyObject *r = PyDict_New();
     PyDict_SetItem(r, PyString_FromString("score"),
-		   PyFloat_FromDouble((float) output_scores[n]));
+                   PyFloat_FromDouble((float) output_scores[n]));
     PyDict_SetItem(r, PyString_FromString("index"),
-		   PyInt_FromLong((long) output_indices[n]));
+                   PyInt_FromLong((long) output_indices[n]));
     PyList_SetItem(results, n, r);
   }
 
@@ -178,13 +213,14 @@ static PyObject *echoprint_py_query_inverted_index(PyObject *self, PyObject *arg
 }
 
 
-static PyObject *echoprint_py_inverted_index_create_block(PyObject *self, PyObject *args)
+static PyObject *echoprint_py_inverted_index_create_block(
+  PyObject *self, PyObject *args)
 {
   // input is a list of lists, each item of the outer list being a
   // song (list of codes); second argument is the output path
 
   PyObject *arg_songs, *arg_output_path;
-  int n, m, n_songs, error_parsing_input;
+  int n, m, n_songs, error_parsing_input, error_writing_blocks;
   char *path_out;
   uint32_t **block_songs_codes;
   uint32_t *block_song_lengths;
@@ -195,7 +231,8 @@ static PyObject *echoprint_py_inverted_index_create_block(PyObject *self, PyObje
   error_parsing_input = 0;
   if(!PyList_Check(arg_songs))
   {
-    PyErr_SetString(PyExc_TypeError, "first argument must be a list (of lists of codes)");
+    PyErr_SetString(
+      PyExc_TypeError, "first argument must be a list (of lists of codes)");
     return NULL;
   }
 
@@ -211,16 +248,19 @@ static PyObject *echoprint_py_inverted_index_create_block(PyObject *self, PyObje
   {
     if(error_parsing_input)
       break;
-    else{
+    else
+    {
       PyObject * py_song_seq = PySequence_GetItem(arg_songs, n);
       uint32_t song_length = PyList_Size(py_song_seq);
-      block_songs_codes[n] = (uint32_t *) malloc(sizeof(uint32_t) * song_length);
+      block_songs_codes[n] = (uint32_t *) malloc(
+	sizeof(uint32_t) * song_length);
       for(m = 0; m < song_length; m++)
       {
 	PyObject *code = PyList_GetItem(py_song_seq, m);
 	if(!PyInt_Check(code))
 	{
-	  PyErr_SetString(PyExc_TypeError, "all codes in input songs must be integers");
+	  PyErr_SetString(
+	    PyExc_TypeError, "all codes in input songs must be integers");
 	  error_parsing_input = 1;
 	  break;
 	}
@@ -232,9 +272,16 @@ static PyObject *echoprint_py_inverted_index_create_block(PyObject *self, PyObje
     }
   }
 
+  error_writing_blocks = 0;
   if(!error_parsing_input)
-    echoprint_inverted_index_build_write_block(
-      block_songs_codes, block_song_lengths, n_songs, path_out, 0);
+  {
+    if(echoprint_inverted_index_build_write_block(
+	 block_songs_codes, block_song_lengths, n_songs, path_out, 0))
+    {
+      error_writing_blocks = 1;
+      PyErr_SetString(PyExc_TypeError, "could not write the index block");
+    }
+  }
 
   for(n = 0; n < n_songs; n++)
     if(block_songs_codes[n] != 0)
@@ -242,7 +289,7 @@ static PyObject *echoprint_py_inverted_index_create_block(PyObject *self, PyObje
   free(block_songs_codes);
   free(block_song_lengths);
 
-  if(error_parsing_input)
+  if(error_parsing_input || error_writing_blocks)
     return NULL;
 
   return Py_None;
