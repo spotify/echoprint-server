@@ -3,3 +3,4 @@ java/.idea
 build/*
 java/echoprint-server.iml
 java/target/*
+*.pyc

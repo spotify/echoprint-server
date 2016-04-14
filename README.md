@@ -1,5 +1,9 @@
 # echoprint-server #
 
+[![Build Status](https://api.travis-ci.org/spotify/echoprint-server.svg)](https://travis-ci.org/spotify/echoprint-server)
+[![License](https://img.shields.io/github/license/spotify/echoprint-server.svg)](LICENSE)
+![Platforms supported: Linux and OS X](https://img.shields.io/badge/platform-Linux%20%7C%20OS%20X-blue.svg)
+
 A C library, with a Python extension module and Java bindings, for
 fast indexing and querying of [echoprint](http://echoprint.me/) data.
 
