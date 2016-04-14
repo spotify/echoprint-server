@@ -33,7 +33,7 @@ pip install flake8
 python setup.py install
 
 # Lint the code
-LINT_RESULT=`flake8 .`
+LINT_RESULT=`flake8 --config=.flake8 .`
 
 # Run the tests
 TEST_RESULT=`nosetests`

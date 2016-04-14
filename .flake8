@@ -1,2 +1,2 @@
 [flake8]
-exclude = echoprint_server/__init__.py
+exclude = echoprint_server/__init__.py,echoprintenv/*,build/*
