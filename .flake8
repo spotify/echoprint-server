@@ -1,0 +1,2 @@
+[flake8]
+exclude = echoprint_server/__init__.py

@@ -1,0 +1,13 @@
+language: c
+os:
+  - linux
+  - osx
+compiler:
+  - clang
+  - gcc
+
+script:
+  - ./ci/script.sh
+  # This is a workaround for a Travis-CI bug where the log might get cut-off.
+  # See the [Travis-CI issue #4716](https://github.com/travis-ci/travis-ci/issues/4716).
+  - sleep 3
