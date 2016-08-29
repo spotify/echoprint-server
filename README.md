@@ -52,7 +52,7 @@ Usage:
 
 `150555,1035718,621673,794882,40662,955768,96899,166055,...`
 
-*This script only outputs only the echoprint codes, not the
+*This script only outputs the echoprint codes, not the
  offsets. `jq` is a command line tool to process JSON strings, it can
  be found [here](https://stedolan.github.io/jq/).*
 
