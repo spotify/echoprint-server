@@ -197,12 +197,18 @@ static PyObject *echoprint_py_query_inverted_index(
   results = PyList_New(n_results);
   for(n = 0; n < n_results; n++)
   {
-    PyObject *r = PyDict_New();
-    PyDict_SetItem(r, PyString_FromString("score"),
-                   PyFloat_FromDouble((float) output_scores[n]));
-    PyDict_SetItem(r, PyString_FromString("index"),
-                   PyInt_FromLong((long) output_indices[n]));
-    PyList_SetItem(results, n, r);
+    PyObject *r = PyDict_New();                                                                                                                                                                                                        
+    PyStringObject* score_k = (PyStringObject*)PyString_FromString("score");
+    PyFloatObject* score_v = (PyFloatObject*)PyFloat_FromDouble((float) output_scores[n]);
+    PyDict_SetItem(r, (PyObject*)score_k, (PyObject*)score_v);
+    Py_DECREF(score_k);
+    Py_DECREF(score_v);
+    PyStringObject* index_k = (PyStringObject*)PyString_FromString("index");
+    PyIntObject* index_v = (PyIntObject*)PyInt_FromLong((long) output_indices[n]);
+    PyDict_SetItem(r, (PyObject*)index_k, (PyObject*)index_v);
+    Py_DECREF(index_k);
+    Py_DECREF(index_v);
+    PyList_SetItem(results, n, r); 
   }
 
   free(output_indices);
