@@ -34,7 +34,7 @@ typedef enum
    different file; the serialization format is just a contiguous
    memory dump of all the data in the struct in order.
 
-   For each distinc code, a code block contains the sequence of
+   For each distinct code, a code block contains the sequence of
    indexes corresponding to songs in which the code appears. The
    `song_indices` field contains a contiguous dump of all codeblocks,
    the other fields provide ways to index into it.
