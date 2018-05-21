@@ -24,3 +24,4 @@ if __name__ == '__main__':
         print json.dumps(
             {'results' : query_inverted_index(
                 codes, inverted_index, 'jaccard')})
+        sys.stdout.flush()
