@@ -66,7 +66,11 @@ def parsed_code_streamer(fstream):
     '''
     Convenience generator for reading comma-separated list of integers
     '''
-    for line in fstream:
+    while True:
+        line = fstream.readline()
+        if line == '':
+            break
+
         yield [int(c) for c in line.strip().split(',')]
 
 
@@ -74,5 +78,9 @@ def parsing_code_streamer(fstream):
     '''
     Convenience generator for converting echoprint strings into codes
     '''
-    for line in fstream:
+    while True:
+        line = fstream.readline()
+        if line == '':
+            break
+
         yield decode_echoprint(line.strip())[1]
